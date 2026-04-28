@@ -27,8 +27,11 @@ app.secret_key = "quiz-master-secret"
 db.init_app(app)
 
 # ---------------- INIT DB, SEED ROLES & ADMIN ----------------
-with app.app_context():
-    db.create_all()
+try:
+    with app.app_context():
+        db.create_all()
+except Exception as e:
+    print("DB skipped:", e)
 
     # Seed roles
     for r in ["staff", "student"]:
