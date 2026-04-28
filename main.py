@@ -7,7 +7,7 @@ from datetime import datetime
 from datetime import date
 from controller.models import Admin, User, Role, UserRole, Staff, Student, Quiz, Question, Option,StudentResult
 from sqlalchemy import or_
-from gemini_service import QuizGenerator # Make sure the file name matches exactly
+#from gemini_service import QuizGenerator # Make sure the file name matches exactly
 import json
 
 import os
@@ -15,13 +15,15 @@ import os
 app = Flask(__name__,
             template_folder=os.path.join(os.getcwd(), "templates"),
             static_folder=os.path.join(os.getcwd(), "static"))
-@app.route("/test")
-def test():
-    return "Vercel Working ✅"
 @app.route("/")
 def home():
-    admin = Admin.query.first()   # fetch admin from DB
-    return render_template("home.html", admin=admin)
+    return render_template("home.html")
+
+@app.route("/test")
+def test():
+    return "App is running on Vercel ✅"
+
+
 app.config.from_object(Config)
 app.secret_key = "quiz-master-secret"
 
@@ -32,7 +34,7 @@ try:
     with app.app_context():
         db.create_all()
 except Exception as e:
-    print("DB skipped:", e)
+    print("DB disabled on Vercel:", e)
 
     # Seed roles
     for r in ["staff", "student"]:

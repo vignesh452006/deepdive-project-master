@@ -1,5 +1,5 @@
 Flask
 Flask-SQLAlchemy
-jinja2
 Werkzeug
+jinja2
 python-dotenv
