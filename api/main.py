@@ -18,6 +18,9 @@ app = Flask(__name__,
 @app.route("/")
 def home():
     return "Vercel Working ✅"
+@app.route("/")
+def home():
+    return render_template("home.html")
 app.config.from_object(Config)
 app.secret_key = "quiz-master-secret"
 
