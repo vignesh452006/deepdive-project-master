@@ -15,12 +15,13 @@ import os
 app = Flask(__name__,
             template_folder=os.path.join(os.getcwd(), "templates"),
             static_folder=os.path.join(os.getcwd(), "static"))
-@app.route("/")
-def home():
+@app.route("/test")
+def test():
     return "Vercel Working ✅"
 @app.route("/")
 def home():
-    return render_template("home.html")
+    admin = Admin.query.first()   # fetch admin from DB
+    return render_template("home.html", admin=admin)
 app.config.from_object(Config)
 app.secret_key = "quiz-master-secret"
 
@@ -53,10 +54,7 @@ except Exception as e:
         print("✅ Admin created in admins table")
 
 # ---------------- HOME ----------------
-@app.route("/")
-def home():
-    admin = Admin.query.first()   # fetch admin from DB
-    return render_template("home.html", admin=admin)
+
 
 # ---------------- REGISTER (STAFF/STUDENT) ----------------
 @app.route("/register", methods=["GET", "POST"])
