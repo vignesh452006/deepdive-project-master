@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Create Quiz</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    .question-box { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #fff; }
+    .ai-section { border: 2px solid #6f42c1; background-color: #f8f0ff; padding: 20px; border-radius: 10px; margin-bottom: 30px; }
+    .form-label { font-weight: bold; }
+</style>
+
+<script>
+let qCount = 0; 
+
+function addQuestion(qText="", a="", b="", c="", d="", correctIndex=null) {
+    qCount++;
+    const container = document.getElementById("questions");
+    const box = document.createElement("div");
+    box.className = "question-box";
+    
+    // Map numerical index (0-3) to dropdown values (a-d)
+    const letters = ['a', 'b', 'c', 'd'];
+    const correctValue = (correctIndex !== null && correctIndex >= 0) ? letters[correctIndex] : "";
+
+    box.innerHTML = `
+        <h6>Question ${qCount}</h6>
+        <input type="text" name="question_${qCount}" class="form-control mb-2" value="${qText}" placeholder="Enter question" required>
+        <div class="row g-2 mb-2">
+            <div class="col-md-6"><input type="text" name="q${qCount}_a" class="form-control" value="${a}" placeholder="Option A" required></div>
+            <div class="col-md-6"><input type="text" name="q${qCount}_b" class="form-control" value="${b}" placeholder="Option B" required></div>
+            <div class="col-md-6"><input type="text" name="q${qCount}_c" class="form-control" value="${c}" placeholder="Option C" required></div>
+            <div class="col-md-6"><input type="text" name="q${qCount}_d" class="form-control" value="${d}" placeholder="Option D" required></div>
+        </div>
+        <select name="q${qCount}_correct" class="form-select" required>
+            <option value="">Select Correct Option</option>
+            <option value="a" ${correctValue === 'a' ? 'selected' : ''}>A</option>
+            <option value="b" ${correctValue === 'b' ? 'selected' : ''}>B</option>
+            <option value="c" ${correctValue === 'c' ? 'selected' : ''}>C</option>
+            <option value="d" ${correctValue === 'd' ? 'selected' : ''}>D</option>
+        </select>
+    `;
+    container.appendChild(box);
+}
+
+async function generateAI() {
+    const topicInput = document.getElementById("ai-topic");
+    const numInput = document.getElementById("ai-num");
+    const btn = document.getElementById("ai-btn");
+
+    if(!topicInput.value) { alert("Please enter a topic!"); return; }
+
+    btn.disabled = true;
+    btn.innerText = "Generating...";
+
+    const formData = new FormData();
+    formData.append("topic", topicInput.value);
+    formData.append("num_questions", numInput.value);
+
+    try {
+        const response = await fetch("/ai_generate_quiz", { method: "POST", body: formData });
+        const data = await response.json();
+
+        if (data.status === "success" && data.questions) {
+            // Clear current list to replace with AI questions
+            document.getElementById("questions").innerHTML = "";
+            qCount = 0; 
+
+            data.questions.forEach(q => {
+                // Correctly mapping AI fields to addQuestion parameters
+                addQuestion(
+                    q.question, 
+                    q.options[0], 
+                    q.options[1], 
+                    q.options[2], 
+                    q.options[3], 
+                    q.answer_index
+                );
+            });
+            
+            // Set the main Subject field to match the AI topic
+            document.getElementById("main-subject").value = topicInput.value;
+        } else {
+            alert("AI Error: " + (data.error || "Unknown error occurred"));
+        }
+    } catch (e) {
+        alert("Connection Error: Check if your Flask server is running.");
+        console.error(e);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Generate Questions";
+    }
+}
+
+// Initial empty question on load
+window.onload = () => { if(qCount === 0) addQuestion(); };
+</script>
+</head>
+
+<body class="bg-light">
+<div class="container mt-4 mb-5">
+
+    <div class="ai-section shadow-sm">
+        <h4>✨ Advanced AI Quiz Builder</h4>
+        <div class="row g-2">
+            <div class="col-md-5">
+                <input type="text" id="ai-topic" class="form-control" placeholder="Enter Subject/Topic (e.g., Python Basics)">
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="ai-num" class="form-control" value="3" min="1" max="10">
+            </div>
+            <div class="col-md-4">
+                <button type="button" id="ai-btn" onclick="generateAI()" class="btn btn-primary w-100">Generate Questions</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 shadow">
+        <h3 class="mb-4">📝 Create New Quiz</h3>
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" name="subject" id="main-subject" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Chapter/Unit</label>
+                    <input type="text" name="chapter" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Quiz Date</label>
+                    <input type="date" name="date" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Duration (minutes)</label>
+                    <input type="number" name="duration" class="form-control" value="30" required>
+                </div>
+            </div>
+
+            <hr>
+            <h5 class="mb-3">Questions</h5>
+            <div id="questions">
+                </div>
+
+            <div class="d-flex justify-content-between mt-3">
+                <button type="button" onclick="addQuestion()" class="btn btn-outline-secondary">
+                    ➕ Add Manual Question
+                </button>
+                <div>
+                    <a href="{{ url_for('staff_dashboard') }}" class="btn btn-secondary me-2">Back</a>
+                    <button type="submit" class="btn btn-success">Save Full Quiz</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

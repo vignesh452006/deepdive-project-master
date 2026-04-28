@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+.dashboard-bg {
+    height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    flex-direction: column;
+}
+.navbar-custom {
+    background: rgba(0,0,0,0.6);
+}
+.navbar-custom .nav-link,
+.navbar-custom .navbar-brand {
+    color: #fff !important;
+}
+.dashboard-wrap {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 35px 40px;
+    border-radius: 18px;
+    width: 95%;
+    max-width: 900px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    position: relative;
+}
+.logout-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+.btn-dash {
+    min-width: 220px;
+    margin: 8px 0;
+    font-size: 16px;
+}
+.table-custom {
+    background: rgba(255,255,255,0.9);
+    color: #000;
+    border-radius: 10px;
+    overflow: hidden;
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard-bg">
+
+    <!-- ✅ Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom px-4">
+        <a class="navbar-brand" href="{{ url_for('home') }}">🧠 Quiz Master</a>
+
+        <div class="collapse navbar-collapse show">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home') }}">🏠 Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('student_summary') }}">📊 Summary</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('profile') }}">👤 Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('settings') }}">⚙️ Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{{ url_for('logout') }}">🚪 Logout</a>
+                </li>
+
+                <!-- ✅ Search: subject / quiz → View Quizzes -->
+                <li class="nav-item ms-3">
+                    <form class="d-flex" method="get" action="{{ url_for('view_quizzes') }}">
+                        <input class="form-control form-control-sm me-2"
+                               type="search" name="q"
+                               placeholder="Search subject / quiz">
+                        <button class="btn btn-sm btn-outline-light" type="submit">
+                            🔍
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ✅ Main Dashboard -->
+    <div class="dashboard-wrap">
+        <div class="dashboard-card">
+
+            <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm logout-btn">
+                Logout
+            </a>
+
+            <h2 class="mb-1">🎓 Student Dashboard</h2>
+            <p class="mb-3">Welcome, <strong>{{ username }}</strong>!</p>
+
+            <!-- ✅ Action Buttons -->
+            <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
+                <a href="{{ url_for('attempt_quiz') }}" class="btn btn-primary btn-dash">
+                    📝 Attempt Quiz
+                </a>
+                <a href="{{ url_for('view_results') }}" class="btn btn-success btn-dash">
+                    📊 View Results
+                </a>
+                <a href="{{ url_for('view_quizzes') }}" class="btn btn-warning btn-dash">
+                    📚 View Quizzes
+                </a>
+            </div>
+
+            <!-- ✅ Upcoming Quizzes Table -->
+            <h5 class="text-white mb-3">⏳ Upcoming Quizzes</h5>
+            <div class="table-responsive table-custom">
+                <table class="table table-bordered table-striped mb-0 text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Subject</th>
+                            <th>Chapter</th>
+                            <th>Date</th>
+                            <th>Duration (mins)</th>
+                            <th>Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if upcoming_quizzes %}
+                        {% for q in upcoming_quizzes %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ q.subject }}</td>
+                            <td>{{ q.chapter }}</td>
+                            <td>{{ q.date }}</td>
+                            <td>{{ q.duration }}</td>
+                            <td>
+                                <a href="{{ url_for('view_quiz', quiz_id=q.id) }}"
+                                   class="btn btn-sm btn-info">View</a>
+                                <a href="{{ url_for('start_quiz', quiz_id=q.id) }}"
+                                   class="btn btn-sm btn-primary">Start</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-muted">No upcoming quizzes</td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

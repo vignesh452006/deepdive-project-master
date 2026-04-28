@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Staff Dashboard - Quiz Master</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.bg-dashboard {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1f4037, #99f2c8);
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-custom {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.navbar-custom .nav-link,
+.navbar-custom .navbar-brand {
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.navbar-custom .nav-link:hover {
+    text-decoration: underline;
+}
+
+.dashboard-wrap {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-box {
+    background: #fff;
+    padding: 45px;
+    border-radius: 18px;
+    width: 90%;
+    max-width: 720px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+}
+
+.btn-dash {
+    padding: 15px;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-dashboard">
+
+    <!-- ✅ Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom px-4">
+        <a class="navbar-brand" href="{{ url_for('home') }}">🧠 Quiz Master</a>
+
+        <div class="collapse navbar-collapse show" id="staffNav">
+
+            <!-- ✅ Search Bar -->
+            <form class="d-flex me-3" method="get" action="{{ url_for('staff_search_students') }}">
+                <input class="form-control form-control-sm me-2" type="search" name="q"
+                       placeholder="Search students / results">
+                <button class="btn btn-sm btn-outline-light" type="submit">🔍</button>
+            </form>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('home') }}">🏠 Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('summary') }}">📊 Summary</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('profile') }}">👤 Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('settings') }}">⚙️ Settings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{{ url_for('logout') }}">🚪 Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ✅ Center Card like Student Dashboard -->
+    <div class="dashboard-wrap">
+        <div class="card-box">
+
+            <h2 class="mb-2">🧑‍🏫 Staff Dashboard</h2>
+            <p class="mb-4">Welcome, <strong>{{ username }}</strong></p>
+
+            <div class="d-grid gap-3">
+                <a href="{{ url_for('create_quiz') }}" class="btn btn-primary btn-dash">
+                    📝 Create Quizzes & Questions
+                </a>
+
+                <a href="{{ url_for('manage_quizzes') }}" class="btn btn-success btn-dash">
+                    👥 Manage Quizzes
+                </a>
+
+                <a href="{{ url_for('view_results') }}" class="btn btn-warning btn-dash">
+                    📊 Student Results
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
