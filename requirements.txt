@@ -3,4 +3,5 @@ Flask-SQLAlchemy
 Werkzeug
 jinja2
 python-dotenv
+flask
 gunicorn
